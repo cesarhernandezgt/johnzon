@@ -17,7 +17,7 @@
  * under the License.
  */
 package org.apache.johnzon.mapper;
-
+import org.apache.johnzon.mapper.util.JsonProviderUtil;
 import org.apache.johnzon.core.JsonParserFactoryImpl;
 import org.apache.johnzon.mapper.access.AccessMode;
 import org.apache.johnzon.mapper.access.BaseAccessMode;
@@ -139,6 +139,7 @@ public class MapperBuilder {
     public Mapper build() {
         if (readerFactory == null || generatorFactory == null) {
             final JsonProvider provider = JsonProvider.provider();
+            JsonProviderUtil.setMaxBigDecimalScale(provider, maxBigDecimalScale);
             final Map<String, Object> config = new HashMap<String, Object>();
             if (bufferStrategy != null) {
                 config.put(JsonParserFactoryImpl.BUFFER_STRATEGY, bufferStrategy);
