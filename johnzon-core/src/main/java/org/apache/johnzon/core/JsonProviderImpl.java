@@ -40,6 +40,7 @@ import javax.json.stream.JsonParserFactory;
 
 public class JsonProviderImpl extends JsonProvider implements Serializable {
     private static final JsonProvider DELEGATE = new JsonProviderDelegate();
+    private int maxBigDecimalScale = Integer.getInteger("johnzon.max-big-decimal-scale", 1000);
 
     @Override
     public JsonParser createParser(final Reader reader) {
@@ -114,6 +115,14 @@ public class JsonProviderImpl extends JsonProvider implements Serializable {
     @Override
     public JsonBuilderFactory createBuilderFactory(final Map<String, ?> stringMap) {
         return DELEGATE.createBuilderFactory(stringMap);
+    }
+
+    public int getMaxBigDecimalScale() {
+        return maxBigDecimalScale;
+    }
+
+    public void setMaxBigDecimalScale(final int maxBigDecimalScale) {
+        this.maxBigDecimalScale = maxBigDecimalScale;
     }
     
     static class JsonProviderDelegate extends JsonProvider {
