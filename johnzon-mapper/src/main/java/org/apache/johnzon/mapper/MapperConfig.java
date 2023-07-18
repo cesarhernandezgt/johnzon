@@ -67,6 +67,7 @@ public /* DON'T MAKE IT HIDDEN */ class MapperConfig implements Cloneable {
     private final SerializeValueFilter serializeValueFilter;
     private final boolean useBigDecimalForFloats;
     private final Boolean deduplicateObjects;
+    private int maxBigDecimalScale;
 
     private final Map<Class<?>, ObjectConverter.Writer<?>> objectConverterWriterCache;
     private final Map<Class<?>, ObjectConverter.Reader<?>> objectConverterReaderCache;
@@ -85,6 +86,7 @@ public /* DON'T MAKE IT HIDDEN */ class MapperConfig implements Cloneable {
                         final boolean enforceQuoteString, final boolean failOnUnknown,
                         final SerializeValueFilter serializeValueFilter,
                         final boolean useBigDecimalForFloats,
+                        final int maxBigDecimalScale,
                         final Boolean deduplicateObjects) {
     //CHECKSTYLE:ON
         this.objectConverterWriters = objectConverterWriters;
@@ -98,6 +100,7 @@ public /* DON'T MAKE IT HIDDEN */ class MapperConfig implements Cloneable {
         this.readAttributeBeforeWrite = readAttributeBeforeWrite;
         this.accessMode = accessMode;
         this.encoding = encoding;
+        this.maxBigDecimalScale = maxBigDecimalScale;
         this.adapters = adapters;
         this.attributeOrder = attributeOrder;
         this.enforceQuoteString = enforceQuoteString;
@@ -116,6 +119,9 @@ public /* DON'T MAKE IT HIDDEN */ class MapperConfig implements Cloneable {
         this.deduplicateObjects = deduplicateObjects;
     }
 
+    public int getMaxBigDecimalScale() {
+        return maxBigDecimalScale;
+    }
 
     public SerializeValueFilter getSerializeValueFilter() {
         return serializeValueFilter;

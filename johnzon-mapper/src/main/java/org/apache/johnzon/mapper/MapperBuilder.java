@@ -134,6 +134,7 @@ public class MapperBuilder {
     private SerializeValueFilter serializeValueFilter;
     private boolean useBigDecimalForFloats;
     private Boolean deduplicateObjects = null;
+    private int maxBigDecimalScale = 1000;
 
     public Mapper build() {
         if (readerFactory == null || generatorFactory == null) {
@@ -224,7 +225,7 @@ public class MapperBuilder {
                         skipNull, skipEmptyArray,
                         treatByteArrayAsBase64, treatByteArrayAsBase64URL, readAttributeBeforeWrite,
                         accessMode, encoding, attributeOrder, enforceQuoteString, failOnUnknownProperties,
-                        serializeValueFilter, useBigDecimalForFloats, deduplicateObjects),
+                        serializeValueFilter, useBigDecimalForFloats,maxBigDecimalScale, deduplicateObjects),
                 closeables);
     }
 
@@ -372,6 +373,11 @@ public class MapperBuilder {
 
     public MapperBuilder setEncoding(final String encoding) {
         this.encoding = Charset.forName(encoding);
+        return this;
+    }
+
+    public MapperBuilder setMaxBigDecimalScale(final int maxBigDecimalScale) {
+        this.maxBigDecimalScale = maxBigDecimalScale;
         return this;
     }
 

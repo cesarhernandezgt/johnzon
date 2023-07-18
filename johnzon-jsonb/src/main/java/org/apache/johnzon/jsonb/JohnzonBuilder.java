@@ -209,6 +209,11 @@ public class JohnzonBuilder implements JsonbBuilder {
         config.getProperty("johnzon.useBigDecimalForFloats")
                 .map(v -> !Boolean.class.isInstance(v) ? Boolean.parseBoolean(v.toString()) : Boolean.class.cast(v))
                 .ifPresent(builder::setUseBigDecimalForFloats);
+
+        config.getProperty("johnzon.use-big-decimal-for-object").map(this::toBool).orElse(true);
+        builder.setMaxBigDecimalScale(
+                config.getProperty("johnzon.max-big-decimal-scale").map(this::toInt).orElse(1000));
+
         config.getProperty("johnzon.deduplicateObjects")
                 .map(v -> !Boolean.class.isInstance(v) ? Boolean.parseBoolean(v.toString()) : Boolean.class.cast(v))
                 .ifPresent(builder::setDeduplicateObjects);
@@ -371,6 +376,13 @@ public class JohnzonBuilder implements JsonbBuilder {
                 }
             }
         } : new JohnzonJsonb(mapper);
+    }
+
+    private Boolean toBool(final Object v) {
+        return !Boolean.class.isInstance(v) ? Boolean.parseBoolean(v.toString()) : Boolean.class.cast(v);
+    }
+    private Integer toInt(final Object v) {
+        return !Integer.class.isInstance(v) ? Integer.parseInt(v.toString()) : Integer.class.cast(v);
     }
 
     private AccessMode toAccessMode(final Object s) {
