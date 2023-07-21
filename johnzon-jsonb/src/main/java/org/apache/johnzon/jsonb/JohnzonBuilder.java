@@ -138,7 +138,10 @@ public class JohnzonBuilder implements JsonbBuilder {
         if (config == null) {
             config = new JsonbConfig();
         }
-
+        builder.setUseBigDecimalForObjectNumbers(config.getProperty("johnzon.use-big-decimal-for-object")
+                .map(this::toBool).orElse(true));
+        builder.setMaxBigDecimalScale(config.getProperty("johnzon.max-big-decimal-scale")
+                .map(this::toInt).orElse(1000));
         if (config.getProperty(JsonbConfig.FORMATTING).map(Boolean.class::cast).orElse(false)) {
             builder.setPretty(true);
         }
@@ -299,6 +302,11 @@ public class JohnzonBuilder implements JsonbBuilder {
         });
 
         getBeanManager(); // force detection
+
+        builder.setReadAttributeBeforeWrite(config.getProperty("johnzon.readAttributeBeforeWrite")
+                .map(Boolean.class::cast).orElse(false));
+        builder.setAutoAdjustStringBuffers(config.getProperty("johnzon.autoAdjustBuffer")
+                .map(Boolean.class::cast).orElse(true));
 
         builder.setReadAttributeBeforeWrite(
                 config.getProperty("johnzon.readAttributeBeforeWrite").map(Boolean.class::cast).orElse(false));

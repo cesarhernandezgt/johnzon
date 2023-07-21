@@ -135,6 +135,7 @@ public class MapperBuilder {
     private boolean useBigDecimalForFloats;
     private Boolean deduplicateObjects = null;
     private int maxBigDecimalScale = 1000;
+    private boolean useBigDecimalForObjectNumbers;
 
     public Mapper build() {
         if (readerFactory == null || generatorFactory == null) {
@@ -226,7 +227,8 @@ public class MapperBuilder {
                         skipNull, skipEmptyArray,
                         treatByteArrayAsBase64, treatByteArrayAsBase64URL, readAttributeBeforeWrite,
                         accessMode, encoding, attributeOrder, enforceQuoteString, failOnUnknownProperties,
-                        serializeValueFilter, useBigDecimalForFloats,maxBigDecimalScale, deduplicateObjects),
+                        serializeValueFilter, useBigDecimalForFloats,useBigDecimalForObjectNumbers,maxBigDecimalScale,
+                        deduplicateObjects),
                 closeables);
     }
 
@@ -460,6 +462,11 @@ public class MapperBuilder {
      */
     public MapperBuilder setDeduplicateObjects(Boolean deduplicateObjects) {
         this.deduplicateObjects = deduplicateObjects;
+        return this;
+    }
+
+    public MapperBuilder setUseBigDecimalForObjectNumbers(final boolean value) {
+        this.useBigDecimalForObjectNumbers = value;
         return this;
     }
 }
