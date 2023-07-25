@@ -33,7 +33,7 @@
   <groupId>org.apache.johnzon</groupId>
   <artifactId>johnzon</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.2</version>
+  <version>1.0.2-TT.1-SNAPSHOT</version>
   <name>Apache Johnzon</name>
   <description>Apache Johnzon is an implementation of JSR-353 (JavaTM API for JSON Processing).</description>
   <inceptionYear>2014</inceptionYear>
@@ -47,13 +47,28 @@
     <staging.directory>${project.build.directory}/site</staging.directory>
     <felix.plugin.version>2.5.3</felix.plugin.version>
     <bnd.version.policy>[$(version;==;$(@)),$(version;+;$(@)))</bnd.version.policy>
-    <java-compile.version>1.6</java-compile.version>
+    <java-compile.version>1.8</java-compile.version>
     <cxf.version>3.0.0</cxf.version>
     <javadoc.params /> <!-- for java 8 set disable doclint (by profile) -->
     <checkstyle.version>2.15</checkstyle.version> <!-- checkstyle > 2.15 version do not support java 6 -->
     <!-- JVM values for surefire plugin -->
     <surefire.jvm.params>-Xms1024m -Xmx2048m -Dfile.encoding=UTF-8</surefire.jvm.params>
   </properties>
+
+
+  <distributionManagement>
+    <repository>
+      <id>tomitribe.releases.https</id>
+      <name>Tomitribe Release Distribution Repository</name>
+      <url>https://repository.tomitribe.com/service/local/staging/deploy/maven2</url>
+    </repository>
+
+    <snapshotRepository>
+      <id>tomitribe.snapshots.https</id>
+      <name>Tomitribe Development Snapshot Repository</name>
+      <url>https://repository.tomitribe.com/content/repositories/snapshots-tomitribe</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <modules>
     <module>johnzon-core</module>
@@ -389,18 +404,12 @@
     <url>https://issues.apache.org/jira/browse/JOHNZON</url>
   </issueManagement>
 
-  <distributionManagement>
-    <site>
-      <id>apache.website</id>
-      <url>${pubsub.url}</url>
-    </site>
-  </distributionManagement>
 
   <scm>
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/johnzon.git</connection>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/johnzon.git</developerConnection>
-    <url>https://git-wip-us.apache.org/repos/asf?p=johnzon.git</url>
-    <tag>v1.0.2</tag>
+    <connection>scm:git:https://github.com/tomitribe/johnzon.git</connection>
+    <developerConnection>scm:git:https://github.com/tomitribe/johnzon.git</developerConnection>
+    <url>scm:git:https://github.com/tomitribe/johnzon.git</url>
+    <tag>HEAD</tag>
   </scm>
 
   <reporting>
