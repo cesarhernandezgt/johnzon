@@ -31,6 +31,11 @@ import java.util.Map;
 
 class JsonObjectBuilderImpl implements JsonObjectBuilder, Serializable {
     private Map<String, JsonValue> attributeMap = new LinkedHashMap<String, JsonValue>();
+    private JsonProviderImpl.JsonProviderDelegate provider;
+
+    public JsonObjectBuilderImpl(final JsonProviderImpl.JsonProviderDelegate provider) {
+        this.provider = provider;
+    }
 
     @Override
     public JsonObjectBuilder add(final String name, final JsonValue value) {
@@ -46,13 +51,13 @@ class JsonObjectBuilderImpl implements JsonObjectBuilder, Serializable {
 
     @Override
     public JsonObjectBuilder add(final String name, final BigInteger value) {
-        putValue(name, new JsonNumberImpl(new BigDecimal(value)));
+        putValue(name, new JsonNumberImpl(new BigDecimal(value), provider::checkBigDecimalScale));
         return this;
     }
 
     @Override
     public JsonObjectBuilder add(final String name, final BigDecimal value) {
-        putValue(name, new JsonNumberImpl(value));
+        putValue(name, new JsonNumberImpl(value, provider::checkBigDecimalScale));
         return this;
     }
 

@@ -34,10 +34,12 @@ public class JsonReaderImpl implements JsonReader {
     private final JohnzonJsonParser parser;
     private boolean closed = false;
 
+    private JsonProviderImpl.JsonProviderDelegate provider;
+
     private boolean subStreamReader;
 
-    public JsonReaderImpl(final JsonParser parser) {
-        this(parser, false);
+    public JsonReaderImpl(final JsonParser parser, final JsonProviderImpl.JsonProviderDelegate provider) {
+        this(parser, false, provider);
     }
 
     /**
@@ -46,7 +48,7 @@ public class JsonReaderImpl implements JsonReader {
      * @param subStreamReader {@code true} if the Stream already got started and the first
      *           operation should not be next() but {@link JohnzonJsonParser#current()} instead.
      */
-    public JsonReaderImpl(final JsonParser parser, boolean subStreamReader) {
+    public JsonReaderImpl(final JsonParser parser, boolean subStreamReader, final JsonProviderImpl.JsonProviderDelegate provider) {
         if (parser instanceof JohnzonJsonParser) {
             this.parser = (JohnzonJsonParser) parser;
         } else {
@@ -54,6 +56,7 @@ public class JsonReaderImpl implements JsonReader {
         }
 
         this.subStreamReader = subStreamReader;
+        this.provider = provider;
     }
 
     @Override
@@ -78,7 +81,7 @@ public class JsonReaderImpl implements JsonReader {
 
         switch (next) {
             case START_OBJECT:
-                final JsonObjectBuilder objectBuilder = new JsonObjectBuilderImpl();
+                final JsonObjectBuilder objectBuilder = new JsonObjectBuilderImpl(provider);
                 parseObject(objectBuilder);
                 if (!subStreamReader) {
                     if (parser.hasNext()) {
@@ -88,7 +91,7 @@ public class JsonReaderImpl implements JsonReader {
                 }
                 return objectBuilder.build();
             case START_ARRAY:
-                final JsonArrayBuilder arrayBuilder = new JsonArrayBuilderImpl();
+                final JsonArrayBuilder arrayBuilder = new JsonArrayBuilderImpl(provider);
                 parseArray(arrayBuilder);
                 if (!subStreamReader) {
                     if (parser.hasNext()) {
@@ -131,7 +134,7 @@ public class JsonReaderImpl implements JsonReader {
                 }
                 return JsonValue.NULL;
             case VALUE_NUMBER:
-                final JsonNumber number = new JsonNumberImpl(parser.getBigDecimal());
+                final JsonNumber number = new JsonNumberImpl(parser.getBigDecimal(), provider::checkBigDecimalScale);
                 if (!subStreamReader) {
                     if (parser.hasNext()) {
                         throw new JsonParsingException("Expected end of file", parser.getLocation());
@@ -190,13 +193,13 @@ public class JsonReaderImpl implements JsonReader {
 
                 case START_OBJECT:
                     JsonObjectBuilder subObject = null;
-                    parseObject(subObject = new JsonObjectBuilderImpl());
+                    parseObject(subObject = new JsonObjectBuilderImpl(provider));
                     builder.add(key, subObject);
                     break;
 
                 case START_ARRAY:
                     JsonArrayBuilder subArray = null;
-                    parseArray(subArray = new JsonArrayBuilderImpl());
+                    parseArray(subArray = new JsonArrayBuilderImpl(provider));
                     builder.add(key, subArray);
                     break;
 
@@ -204,7 +207,7 @@ public class JsonReaderImpl implements JsonReader {
                     if (parser.isIntegralNumber() && parser.isNotTooLong()) {
                         builder.add(key, new JsonLongImpl(parser.getLong()));
                     } else {
-                        builder.add(key, new JsonNumberImpl(parser.getBigDecimal()));
+                        builder.add(key, new JsonNumberImpl(parser.getBigDecimal(),provider::checkBigDecimalScale));
                     }
                     break;
 
@@ -244,19 +247,19 @@ public class JsonReaderImpl implements JsonReader {
                     if (parser.isIntegralNumber()) {
                         builder.add(new JsonLongImpl(parser.getLong()));
                     } else {
-                        builder.add(new JsonNumberImpl(parser.getBigDecimal()));
+                        builder.add(new JsonNumberImpl(parser.getBigDecimal(),provider::checkBigDecimalScale));
                     }
                     break;
 
                 case START_OBJECT:
                     JsonObjectBuilder subObject = null;
-                    parseObject(subObject = new JsonObjectBuilderImpl());
+                    parseObject(subObject = new JsonObjectBuilderImpl(provider));
                     builder.add(subObject);
                     break;
 
                 case START_ARRAY:
                     JsonArrayBuilder subArray = null;
-                    parseArray(subArray = new JsonArrayBuilderImpl());
+                    parseArray(subArray = new JsonArrayBuilderImpl(provider));
                     builder.add(subArray);
                     break;
 

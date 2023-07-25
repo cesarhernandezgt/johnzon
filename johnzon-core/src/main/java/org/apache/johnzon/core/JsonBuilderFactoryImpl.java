@@ -30,6 +30,7 @@ import javax.json.JsonBuilderFactory;
 import javax.json.JsonObjectBuilder;
 
 class JsonBuilderFactoryImpl implements JsonBuilderFactory {
+    private JsonProviderImpl.JsonProviderDelegate provider;
     private final Map<String, Object> internalConfig = new HashMap<String, Object>();
     private static final String[] SUPPORTED_CONFIG_KEYS = new String[] {
     //nothing yet
@@ -37,7 +38,8 @@ class JsonBuilderFactoryImpl implements JsonBuilderFactory {
     };
     protected final Logger logger = Logger.getLogger(this.getClass().getName());
 
-    JsonBuilderFactoryImpl(final Map<String, ?> config) {
+    JsonBuilderFactoryImpl(final Map<String, ?> config, final JsonProviderImpl.JsonProviderDelegate provider) {
+        this.provider = provider;
         if (config != null && config.size() > 0) {
             final List<String> supportedConfigKeys = Arrays.asList(SUPPORTED_CONFIG_KEYS);
             for (String configKey : config.keySet()) {
@@ -52,12 +54,12 @@ class JsonBuilderFactoryImpl implements JsonBuilderFactory {
 
     @Override
     public JsonObjectBuilder createObjectBuilder() {
-        return new JsonObjectBuilderImpl();
+        return new JsonObjectBuilderImpl(provider);
     }
 
     @Override
     public JsonArrayBuilder createArrayBuilder() {
-        return new JsonArrayBuilderImpl();
+        return new JsonArrayBuilderImpl(provider);
     }
 
 

@@ -204,11 +204,13 @@ class JsonInMemoryParser extends JohnzonJsonParserImpl {
 
     }
 
-    JsonInMemoryParser(final JsonObject object) {
+    JsonInMemoryParser(final JsonObject object, final JsonProviderImpl.JsonProviderDelegate provider) {
+        super(provider);
         stack.push(new ObjectIterator(object));
     }
 
-    JsonInMemoryParser(final JsonArray array) {
+    JsonInMemoryParser(final JsonArray array, final JsonProviderImpl.JsonProviderDelegate provider) {
+        super(provider);
         stack.push(new ArrayIterator(array));
     }
 

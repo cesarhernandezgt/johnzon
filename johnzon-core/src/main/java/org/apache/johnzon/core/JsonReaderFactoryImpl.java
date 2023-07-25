@@ -31,29 +31,32 @@ import javax.json.JsonReader;
 import javax.json.JsonReaderFactory;
 
 class JsonReaderFactoryImpl extends AbstractJsonFactory implements JsonReaderFactory {
+    private JsonProviderImpl.JsonProviderDelegate provider;
     static final Collection<String> SUPPORTED_CONFIG_KEYS = asList(
 
     );
     private final JsonParserFactoryImpl parserFactory;
 
-    JsonReaderFactoryImpl(final Map<String, ?> config) {
+    JsonReaderFactoryImpl(final Map<String, ?> config, final JsonProviderImpl.JsonProviderDelegate provider) {
         super(config, SUPPORTED_CONFIG_KEYS, JsonParserFactoryImpl.SUPPORTED_CONFIG_KEYS);
-        this.parserFactory = new JsonParserFactoryImpl(internalConfig);
+        this.provider = provider;
+        this.parserFactory = new JsonParserFactoryImpl(internalConfig, provider);
+
     }
 
     @Override
     public JsonReader createReader(final Reader reader) {
-        return new JsonReaderImpl(parserFactory.createInternalParser(reader));
+        return new JsonReaderImpl(parserFactory.createInternalParser(reader),provider);
     }
 
     @Override
     public JsonReader createReader(final InputStream in) {
-        return new JsonReaderImpl(parserFactory.createInternalParser(in));
+        return new JsonReaderImpl(parserFactory.createInternalParser(in),provider);
     }
 
     @Override
     public JsonReader createReader(final InputStream in, final Charset charset) {
-        return new JsonReaderImpl(parserFactory.createInternalParser(in, charset));
+        return new JsonReaderImpl(parserFactory.createInternalParser(in, charset),provider);
     }
 
     @Override

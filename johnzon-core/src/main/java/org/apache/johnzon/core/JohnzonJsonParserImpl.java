@@ -28,4 +28,9 @@ public abstract class JohnzonJsonParserImpl implements JohnzonJsonParser {
      */
     protected abstract boolean isInArray();
 
+    JsonProviderImpl.JsonProviderDelegate provider;
+
+    public JohnzonJsonParserImpl(JsonProviderImpl.JsonProviderDelegate provider) {
+        this.provider = provider;
+    }
 }

@@ -31,6 +31,11 @@ import java.util.List;
 
 class JsonArrayBuilderImpl implements JsonArrayBuilder, Serializable {
     private List<JsonValue> tmpList;
+    private JsonProviderImpl.JsonProviderDelegate jsonProvider;
+
+    public JsonArrayBuilderImpl(JsonProviderImpl.JsonProviderDelegate jsonProvider) {
+        this.jsonProvider = jsonProvider;
+    }
 
     @Override
     public JsonArrayBuilder add(final JsonValue value) {
@@ -46,13 +51,13 @@ class JsonArrayBuilderImpl implements JsonArrayBuilder, Serializable {
 
     @Override
     public JsonArrayBuilder add(final BigDecimal value) {
-        addValue(new JsonNumberImpl(value));
+        addValue(new JsonNumberImpl(value, jsonProvider::checkBigDecimalScale));
         return this;
     }
 
     @Override
     public JsonArrayBuilder add(final BigInteger value) {
-        addValue(new JsonNumberImpl(new BigDecimal(value)));
+        addValue(new JsonNumberImpl(new BigDecimal(value), jsonProvider::checkBigDecimalScale));
         return this;
     }
 

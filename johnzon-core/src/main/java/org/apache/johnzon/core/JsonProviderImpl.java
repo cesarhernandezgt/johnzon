@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.util.Map;
 
 import javax.json.JsonArrayBuilder;
@@ -39,8 +40,8 @@ import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParserFactory;
 
 public class JsonProviderImpl extends JsonProvider implements Serializable {
-    private static final JsonProvider DELEGATE = new JsonProviderDelegate();
-    private int maxBigDecimalScale = Integer.getInteger("johnzon.max-big-decimal-scale", 1000);
+    private static final JsonProviderDelegate DELEGATE = new JsonProviderDelegate();
+    //private int maxBigDecimalScale = Integer.getInteger("johnzon.max-big-decimal-scale", 1000);
 
     @Override
     public JsonParser createParser(final Reader reader) {
@@ -118,20 +119,29 @@ public class JsonProviderImpl extends JsonProvider implements Serializable {
     }
 
     public int getMaxBigDecimalScale() {
-        return maxBigDecimalScale;
+        return DELEGATE.getMaxBigDecimalScale();
     }
 
     public void setMaxBigDecimalScale(final int maxBigDecimalScale) {
-        this.maxBigDecimalScale = maxBigDecimalScale;
+        DELEGATE.setMaxBigDecimalScale(maxBigDecimalScale);
     }
     
     static class JsonProviderDelegate extends JsonProvider {
-        private final JsonReaderFactory readerFactory = new JsonReaderFactoryImpl(null);
-        private final JsonParserFactory parserFactory = new JsonParserFactoryImpl(null);
+        private final JsonReaderFactory readerFactory = new JsonReaderFactoryImpl(null, this);
+        private final JsonParserFactory parserFactory = new JsonParserFactoryImpl(null, this);
         private final JsonGeneratorFactory generatorFactory = new JsonGeneratorFactoryImpl(null);
         private final JsonWriterFactory writerFactory = new JsonWriterFactoryImpl(null);
-        private final JsonBuilderFactoryImpl builderFactory = new JsonBuilderFactoryImpl(null);
+        private final JsonBuilderFactoryImpl builderFactory = new JsonBuilderFactoryImpl(null,this);
 
+        private int maxBigDecimalScale = Integer.getInteger("johnzon.max-big-decimal-scale", 1_000);
+
+        public int getMaxBigDecimalScale() {
+            return maxBigDecimalScale;
+        }
+
+        public void setMaxBigDecimalScale(int value) {
+            this.maxBigDecimalScale = value;
+        }
         @Override
         public JsonParser createParser(final InputStream in) {
             return parserFactory.createParser(in);
@@ -154,12 +164,14 @@ public class JsonProviderImpl extends JsonProvider implements Serializable {
 
         @Override
         public JsonParserFactory createParserFactory(final Map<String, ?> config) {
-            return (config == null || config.isEmpty()) ? parserFactory : new JsonParserFactoryImpl(config);
+            return (config == null || config.isEmpty()) ? parserFactory : new JsonParserFactoryImpl(config,
+                    this);
         }
 
         @Override
         public JsonReaderFactory createReaderFactory(final Map<String, ?> config) {
-            return (config == null || config.isEmpty()) ? readerFactory : new JsonReaderFactoryImpl(config);
+            return (config == null || config.isEmpty()) ? readerFactory : new JsonReaderFactoryImpl(config,
+                    this);
         }
 
         @Override
@@ -204,7 +216,26 @@ public class JsonProviderImpl extends JsonProvider implements Serializable {
 
         @Override
         public JsonBuilderFactory createBuilderFactory(final Map<String, ?> config) {
-            return (config == null || config.isEmpty()) ? builderFactory : new JsonBuilderFactoryImpl(config);
+            return (config == null || config.isEmpty()) ? builderFactory : new JsonBuilderFactoryImpl(config,
+                    this);
+        }
+
+        public void checkBigDecimalScale(final BigDecimal value) {
+            // should be fine enough. Maybe we should externalize so users can pick something better if they need to
+            // it becomes their responsibility to fix the limit and may expose them to a DoS attack
+            final int limit = DELEGATE.getMaxBigDecimalScale();
+            final int absScale = Math.abs(value.scale());
+
+            if (absScale > limit) {
+                throw new ArithmeticException(String.format(
+                        "BigDecimal scale (%d) limit exceeds maximum allowed (%d)",
+                        value.scale(), limit));
+            }
+
         }
     }
+    public void checkBigDecimalScale(final BigDecimal value) {
+        DELEGATE.checkBigDecimalScale(value);
+    }
+
 }
