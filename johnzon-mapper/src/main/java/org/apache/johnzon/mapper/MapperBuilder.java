@@ -30,7 +30,6 @@ import org.apache.johnzon.mapper.converter.BooleanConverter;
 import org.apache.johnzon.mapper.converter.ByteConverter;
 import org.apache.johnzon.mapper.converter.CachedDelegateConverter;
 import org.apache.johnzon.mapper.converter.CharacterConverter;
-import org.apache.johnzon.mapper.converter.ClassConverter;
 import org.apache.johnzon.mapper.converter.DateConverter;
 import org.apache.johnzon.mapper.converter.DoubleConverter;
 import org.apache.johnzon.mapper.converter.FloatConverter;
@@ -76,7 +75,9 @@ public class MapperBuilder {
         DEFAULT_CONVERTERS.put(new AdapterKey(Date.class, String.class), new ConverterAdapter<Date>(new DateConverter("yyyyMMddHHmmssZ"))); // ISO8601 short
         DEFAULT_CONVERTERS.put(new AdapterKey(URL.class, String.class), new ConverterAdapter<URL>(new URLConverter()));
         DEFAULT_CONVERTERS.put(new AdapterKey(URI.class, String.class), new ConverterAdapter<URI>(new URIConverter()));
-        DEFAULT_CONVERTERS.put(new AdapterKey(Class.class, String.class), new ConverterAdapter<Class<?>>(new ClassConverter()));
+        // no Class.class converter on purpose: deserializing a java.lang.Class from a - potentially untrusted -
+        // document lets the payload pick which class gets loaded, register a ClassConverter with its allow-lists
+        // explicitly if you need it
         DEFAULT_CONVERTERS.put(new AdapterKey(String.class, String.class), new ConverterAdapter<String>(new StringConverter()));
         DEFAULT_CONVERTERS.put(new AdapterKey(BigDecimal.class, String.class), new ConverterAdapter<BigDecimal>(new BigDecimalConverter()));
         DEFAULT_CONVERTERS.put(new AdapterKey(BigInteger.class, String.class), new ConverterAdapter<BigInteger>(new BigIntegerConverter()));
